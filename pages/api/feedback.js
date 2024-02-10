@@ -1,6 +1,16 @@
 import fs from 'fs';
 import path from 'path';
 
+function buildFeedbackPath() {
+    return path.join(process.cwd(), 'data', 'feedback.json');
+}
+
+function extractFeedbackPath(filePath) {
+    const fileData = fs.readFileSync(filepath);
+    const data = JSON.parse(fileData);
+    return data;
+}
+
 function handler(req, res) {
     if (req.method === 'POST') {
         const email = req.body.email;
@@ -13,15 +23,16 @@ function handler(req, res) {
         }
 
         // store in database
-        const filepath = path.join(process.cwd(), 'data', 'feedback.json');
-        const fileData = fs.readFileSync(filepath);
-        const data = JSON.parse(fileData);
+        const filepath = buildFeedbackPath();
+        const data = extractFeedbackPath(filepath);
         data.push(newFeedback);
         fs.watchFileSync(filepath, JSON.stringify(data));
 
         res.status(201).json({ message: 'Success', feedback: newFeedback });
     }else {
-        res.status(200).json({ message: 'This works!' });
+        const filepath = buildFeedbackPath();
+        const data = extractFeedbackPath(filepath)
+        res.status(200).json({ feedback: data });
     }
     
 }
